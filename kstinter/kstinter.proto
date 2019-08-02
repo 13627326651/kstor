@@ -1,0 +1,31 @@
+
+syntax = "proto3";
+
+
+package kstinter;
+
+//
+//进入.proto文件所在目录，执行该命令生成.pb.go文件
+//protoc -I ./ ./kstinter.proto --go_out=plugins=grpc:./
+//
+service kstinter {
+  rpc CreateBucket(req) returns(rsp){}
+  rpc DelBucket(req) returns(rsp){}
+  rpc InsertKey(req) returns(rsp){}
+  rpc DelKey(req) returns(rsp){}
+  rpc GetKey(req) returns(rsp){}
+  rpc GetKeyWithPrefix(req) returns(rsp){}
+}
+
+message req {
+    string bucketName = 1;
+    string key = 2;
+    string value = 3;
+    string prefix = 4;
+}
+
+
+message rsp {
+    string value = 1;
+    map<string, string> k_vs = 2;
+}
