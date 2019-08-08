@@ -15,6 +15,7 @@ service kstinter {
   rpc DelKey(req) returns(rsp){}
   rpc GetKey(req) returns(rsp){}
   rpc GetKeyWithPrefix(req) returns(rsp){}
+  rpc OpenKstDB(req) returns(rsp){}
 }
 
 message req {
@@ -22,6 +23,7 @@ message req {
     string key = 2;
     string value = 3;
     string prefix = 4;
+    string dbname = 5;
 }
 
 

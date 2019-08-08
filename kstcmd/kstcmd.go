@@ -1,10 +1,10 @@
 package kstcmd
 
 import (
+	"../kstclient"
+	"../kstserver"
 	"fmt"
 	"github.com/spf13/cobra"
-	"../kstserver"
-	"../kstclient"
 )
 
 var RootCmd = &cobra.Command{
@@ -12,7 +12,8 @@ var RootCmd = &cobra.Command{
 	Short:"simple [K:V] storage",
 	Long:"simple [K:V] storage",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("RootCmd exec\n");
+		cmd.Usage()
+		//fmt.Printf("RootCmd exec\n");
 	},
 }
 
@@ -47,10 +48,16 @@ type keycontext struct{
 	flag_prefix bool
 }
 
-//上下文全局变量定义
+type restorecontext struct{
+	restore *cobra.Command
+
+	flag_file_name string
+}
+//命令上下文全局变量定义
 var serverctx = servercontext{}
 var buckctx = bucketcontext{}
 var keyctx = keycontext{}
+var restorectx = restorecontext{}
 
 const(
 	FLAG_ADDR = "addr"
@@ -80,6 +87,11 @@ const(
 	FLAG_PREFIX = "prefix"
 	FLAG_PREFIX_DEFAULT = false
 	FLAG_PREFIX_DETAIL = ""
+
+	FLAG_FILE_NAME = "filename"
+	FLAG_FILE_NAME_DEFAULT =""
+	FLAG_FILE_NAME_DETAIL = "restore file name"
+
 )
 
 func init(){
@@ -108,9 +120,8 @@ func init(){
 		Long: "create a bucket",
 		Run: func(cmd *cobra.Command, args []string) {
 			//fmt.Println("create exec")
-			client := kstclient.Client{}
-			client.InitClient(buckctx.flag_addr)
-			client.CreateBucket(buckctx.flag_name)
+			kstclient.InitClient(buckctx.flag_addr)
+			kstclient.CreateBucket(buckctx.flag_name)
 		},
 	}
 	buckctx.delete = &cobra.Command{
@@ -119,9 +130,9 @@ func init(){
 		Long: "delete a bucket",
 		Run: func(cmd *cobra.Command, args []string) {
 			//fmt.Println("delete exec")
-			client := kstclient.Client{}
-			client.InitClient(buckctx.flag_addr)
-			client.DelBucket(buckctx.flag_name)
+
+			kstclient.InitClient(buckctx.flag_addr)
+			kstclient.DelBucket(buckctx.flag_name)
 		},
 	}
 
@@ -141,9 +152,8 @@ func init(){
 		Long:  "set a key",
 		Run: func(cmd *cobra.Command, args []string) {
 			//fmt.Println("set exec")
-			client := kstclient.Client{}
-			client.InitClient(buckctx.flag_addr)
-			client.InsertKey(keyctx.flag_bucket, keyctx.flag_key, keyctx.flag_value)
+			kstclient.InitClient(keyctx.flag_addr)
+			kstclient.InsertKey(keyctx.flag_bucket, keyctx.flag_key, keyctx.flag_value)
 		},
 	}
 	keyctx.delete = &cobra.Command{
@@ -152,9 +162,8 @@ func init(){
 		Long:  "delete a key",
 		Run: func(cmd *cobra.Command, args []string) {
 			//fmt.Println("delete exec")
-			client := kstclient.Client{}
-			client.InitClient(buckctx.flag_addr)
-			client.DelKey(keyctx.flag_bucket, keyctx.flag_key)
+			kstclient.InitClient(keyctx.flag_addr)
+			kstclient.DelKey(keyctx.flag_bucket, keyctx.flag_key)
 		},
 	}
 	keyctx.get = &cobra.Command{
@@ -163,15 +172,24 @@ func init(){
 		Long:  "get a key value",
 		Run: func(cmd *cobra.Command, args []string) {
 			//fmt.Println("get exec")
-			client := kstclient.Client{}
-			client.InitClient(buckctx.flag_addr)
-
+			kstclient.InitClient(keyctx.flag_addr)
 			if keyctx.flag_prefix {
-				client.GetKeyWithPrefix(keyctx.flag_bucket, keyctx.flag_key)
+				kstclient.GetKeyWithPrefix(keyctx.flag_bucket, keyctx.flag_key)
 			}else{
-				client.GetKey(keyctx.flag_bucket, keyctx.flag_key)
+				kstclient.GetKey(keyctx.flag_bucket, keyctx.flag_key)
 			}
 
+		},
+	}
+
+	//restorectx初始化
+	restorectx.restore = &cobra.Command{
+		Use:   "restore",
+		Short: "restore a specific boltdb",
+		Long:  "restore a specific boltdb",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("restore exec")
+			kstclient.UploadFile(restorectx.flag_file_name)
 		},
 	}
 
@@ -220,4 +238,8 @@ func init(){
 	keyctx.delete.MarkFlagRequired(FLAG_BUCKET)
 	keyctx.delete.MarkFlagRequired(FLAG_KEY)
 	keyctx.key.AddCommand(keyctx.delete)
+
+	//添加restore
+	restorectx.restore.Flags().StringVar(&restorectx.flag_file_name, FLAG_FILE_NAME, FLAG_FILE_NAME_DEFAULT, FLAG_FILE_NAME_DETAIL)
+	RootCmd.AddCommand(restorectx.restore)
 }

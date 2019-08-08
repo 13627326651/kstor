@@ -7,27 +7,25 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
 )
 
+var address string
 
-type Client struct{
-	addr string
-}
-
-func (c *Client)InitClient(addr string){
+func InitClient(addr string){
 	_, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	c.addr = addr
+	address = addr
 }
 
 //创建bucket
-func (c *Client)CreateBucket(bn string){
+func CreateBucket(bn string){
 
 	//1 grpc生成连接
-	conn, err := grpc.Dial(c.addr, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,8 +49,8 @@ func (c *Client)CreateBucket(bn string){
 }
 
 //删除bucket
-func (c *Client)DelBucket(bn string){
-	conn, err := grpc.Dial(c.addr, grpc.WithInsecure())
+func DelBucket(bn string){
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,21 +68,15 @@ func (c *Client)DelBucket(bn string){
 }
 
 //插入key/val
-func (c *Client)InsertKey(bn string, k string, v string){
-	log.Printf("1 client insert key [%s:%s]\n", k, v)
-
-	conn, err := grpc.Dial(c.addr, grpc.WithInsecure())
+func InsertKey(bn string, k string, v string){
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
 
-	log.Printf("2 client insert key [%s:%s]\n", k, v)
-
 	cli := kstinter.NewKstinterClient(conn)
 	ctx := context.Background()
-
-	log.Printf("3 client insert key [%s:%s]\n", k, v)
 
 	_, err = cli.InsertKey(ctx, &kstinter.Req{BucketName:bn, Key:k, Value:v})
 	if err != nil {
@@ -95,8 +87,8 @@ func (c *Client)InsertKey(bn string, k string, v string){
 }
 
 //删除key
-func (c *Client)DelKey(bn string, k string){
-	conn, err := grpc.Dial(c.addr, grpc.WithInsecure())
+func DelKey(bn string, k string){
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -114,8 +106,8 @@ func (c *Client)DelKey(bn string, k string){
 }
 
 
-func (c *Client)GetKey(bn string, k string) string{
-	conn, err := grpc.Dial(c.addr, grpc.WithInsecure())
+func GetKey(bn string, k string) string{
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -134,8 +126,8 @@ func (c *Client)GetKey(bn string, k string) string{
 	return r.Value
 }
 
-func (c *Client)GetKeyWithPrefix(bn string, prefix string)(m map[string]string){
-	conn, err := grpc.Dial(c.addr, grpc.WithInsecure())
+func GetKeyWithPrefix(bn string, prefix string)(m map[string]string){
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -157,3 +149,37 @@ func (c *Client)GetKeyWithPrefix(bn string, prefix string)(m map[string]string){
 }
 
 
+func UploadFile(filename string){
+	log.Println("start to upload db", filename)
+	if filename == ""{
+		log.Printf("upload filename is nil")
+		return
+	}
+
+	conn, err := net.Dial("tcp", "localhost:8080")
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	defer conn.Close()
+
+
+	f, err := os.OpenFile(filename, os.O_RDONLY, 0666)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	defer f.Close()
+
+	buf := make([]byte, 1024)
+	for {
+		n, err := f.Read(buf)
+		if err != nil || n < 0{
+			break
+		}
+
+		buf = buf[:n]
+		conn.Write(buf)
+	}
+	log.Printf("upload success\n")
+}

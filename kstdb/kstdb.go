@@ -2,14 +2,14 @@ package kstdb
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/boltdb/bolt"
 	"log"
+	"net/http"
+	"strconv"
 )
 
-/*对外接口，调用者实例化*/
-type KstCtx struct{
-	db *bolt.DB
-}
+var	db *bolt.DB
 
 func checkErrFatal(err error) {
 	if err != nil {
@@ -25,29 +25,36 @@ func checkErr(err error) error{
 	return err
 }
 
+
+
 //打开数据库
-func (ctx *KstCtx)OpenKstDB(dbname string) {
+func OpenKstDB(dbname string) {
 	if dbname == ""{
 		log.Fatalf("open kstdb[%s] error", dbname)
 	}
 	log.Printf("Open kstdb[%s]\n", dbname)
 
+	CloseKstDB()
+
 	var err error
-	ctx.db, err = bolt.Open(dbname,0600, nil)
+	db, err = bolt.Open(dbname,0600, nil)
 	checkErrFatal(err)
 }
 
 //关闭数据库
-func (ctx *KstCtx)CloseKstDB() {
-	if ctx.db != nil {
-		ctx.db.Close()
+func CloseKstDB() {
+	if db != nil {
+		db.Close()
 	}
-	ctx.db = nil
+	db = nil
 }
 
 //创建bucket
-func (ctx *KstCtx)CreateBucket(bucket_name string){
-	ctx.db.Update(func(tx *bolt.Tx) error{
+func CreateBucket(bucket_name string){
+	if db == nil{
+		log.Fatal("database is nil")
+	}
+	db.Update(func(tx *bolt.Tx) error{
 		_, err := tx.CreateBucketIfNotExists(([]byte(bucket_name)))
 		checkErrFatal(err)
 		return nil
@@ -55,8 +62,12 @@ func (ctx *KstCtx)CreateBucket(bucket_name string){
 }
 
 //删除bucket
-func (ctx *KstCtx)DelBucket(bucket_name string){
-	ctx.db.Update(func(tx *bolt.Tx) error{
+func DelBucket(bucket_name string){
+	if db == nil{
+		log.Fatal("database is nil")
+	}
+
+	db.Update(func(tx *bolt.Tx) error{
 		err := tx.DeleteBucket([]byte(bucket_name))
 		checkErr(err)
 		return nil
@@ -64,9 +75,11 @@ func (ctx *KstCtx)DelBucket(bucket_name string){
 }
 
 //插入key/val
-func (ctx *KstCtx)InsertKey(bn string, k string, v string){
-	ctx.db.Update(func(tx *bolt.Tx) error {
-
+func InsertKey(bn string, k string, v string){
+	if db == nil{
+		log.Fatal("database is nil")
+	}
+	db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bn))
 		err := b.Put([]byte(k), []byte(v))
 		return checkErr(err)
@@ -74,8 +87,11 @@ func (ctx *KstCtx)InsertKey(bn string, k string, v string){
 }
 
 //删除key
-func (ctx *KstCtx)DelKey(bn string, k string){
-	ctx.db.Update(func(tx *bolt.Tx) error {
+func DelKey(bn string, k string){
+	if db == nil{
+		log.Fatal("database is nil")
+	}
+	db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bn))
 		if b == nil {
 			log.Print("no bucket")
@@ -86,8 +102,11 @@ func (ctx *KstCtx)DelKey(bn string, k string){
 	})
 }
 
-func (ctx *KstCtx)GetKey(bn string, k string) (v string){
-	ctx.db.View(func(tx *bolt.Tx) error {
+func GetKey(bn string, k string) (v string){
+	if db == nil{
+		log.Fatal("database is nil")
+	}
+	db.View(func(tx *bolt.Tx) error {
 
 		b := tx.Bucket([]byte(bn))
 		if b == nil {
@@ -101,9 +120,11 @@ func (ctx *KstCtx)GetKey(bn string, k string) (v string){
 	return
 }
 
-func (ctx *KstCtx)GetKeyWithPrefix(bn string, prefix string)(m map[string]string){
-
-	ctx.db.View(func(tx *bolt.Tx) error {
+func GetKeyWithPrefix(bn string, prefix string)(m map[string]string){
+	if db == nil{
+		log.Fatal("database is nil")
+	}
+	db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(bn))
 		if b == nil {
 			log.Printf("no bucket")
@@ -120,3 +141,21 @@ func (ctx *KstCtx)GetKeyWithPrefix(bn string, prefix string)(m map[string]string
 	return
 }
 
+
+func BackUp(w http.ResponseWriter, req *http.Request)error{
+	if db == nil{
+		log.Fatal("database is nil")
+	}
+	err := db.View(func(tx *bolt.Tx) error {
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("Content-Disposition", `attachment; filename="my.db"`)
+		w.Header().Set("Content-Length", strconv.FormatInt(tx.Size(), 10))
+		fmt.Printf("backup size:%d\n", tx.Size())
+		_, err := tx.WriteTo(w)
+		return err
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return err
+}
