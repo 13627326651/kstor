@@ -9,13 +9,29 @@ package kstinter;
 //protoc -I ./ ./kstinter.proto --go_out=plugins=grpc:./
 //
 service kstinter {
-  rpc CreateBucket(req) returns(rsp){}
-  rpc DelBucket(req) returns(rsp){}
-  rpc InsertKey(req) returns(rsp){}
-  rpc DelKey(req) returns(rsp){}
-  rpc GetKey(req) returns(rsp){}
-  rpc GetKeyWithPrefix(req) returns(rsp){}
-  rpc OpenKstDB(req) returns(rsp){}
+    //创建bucket
+    rpc CreateBucket(req) returns(rsp){}
+
+    //删除bucket
+    rpc DelBucket(req) returns(rsp){}
+
+    //插入键值对
+    rpc InsertKey(req) returns(rsp){}
+
+    //删除键
+    rpc DelKey(req) returns(rsp){}
+
+    //获取键
+    rpc GetKey(req) returns(rsp){}
+
+    //按前缀获取键值
+    rpc GetKeyWithPrefix(req) returns(rsp){}
+
+    //数据备份
+    rpc BackUp(req) returns(stream frame){}
+
+    //数据恢复
+    rpc Restore(stream frame)returns(rsp){}
 }
 
 message req {
@@ -30,4 +46,9 @@ message req {
 message rsp {
     string value = 1;
     map<string, string> k_vs = 2;
+}
+
+message frame{
+    bytes data = 1;
+    int32 size = 2;
 }

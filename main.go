@@ -16,14 +16,21 @@ kstor key get --key key1 --bucket  bucketname --prefix   (输出以key1开头的
 kstor key delete --key key1 --bucket  bucketname   --addr addr
 
 功能3：backup , restore
-http备份到本地myboltdb.back
-curl http://localhost:8888/backup > myboltdb.back
+kstor backup --filename xxx.db --addr addr
+kstor restore --filename xxx.cb --addr
 
-tcp恢复本地备份文件
-kstor restore --filename myboltdb.back
+性能测试：
+--threads线程数 --count请求数量
+key get test --threads 1 --count 1000
+Test durate  0.883370735 s with 1 groutines for 1000 get reqs.
+吞吐量: 1132.0275399433513 reqs/s
+平均响应时间:0.000883s
 
+key set test --threads 1 --count 1000
+Test durate  52.158495922 s with 1 groutines for 1000 set reqs.
+吞吐量: 19.17233199161728 reqs/s
+平均响应时间:0.052158s
 
-功能4：测试10个客户端同时读写的性能。
 
 要求：
 使用map作为内存缓存，数据落地存储在boltdb 中

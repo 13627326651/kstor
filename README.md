@@ -25,8 +25,6 @@ kstor restore --filename myboltdb.back
 
 
 
-
-
 要求：使用map作为内存缓存，数据落地存储在boltdb 中
 
 其他功能：自由发挥

@@ -142,35 +142,86 @@ func (m *Rsp) GetKVs() map[string]string {
 	return nil
 }
 
+type Frame struct {
+	Data                 []byte   `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Size                 int32    `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Frame) Reset()         { *m = Frame{} }
+func (m *Frame) String() string { return proto.CompactTextString(m) }
+func (*Frame) ProtoMessage()    {}
+func (*Frame) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3d0d0bb72c989a12, []int{2}
+}
+
+func (m *Frame) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Frame.Unmarshal(m, b)
+}
+func (m *Frame) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Frame.Marshal(b, m, deterministic)
+}
+func (m *Frame) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Frame.Merge(m, src)
+}
+func (m *Frame) XXX_Size() int {
+	return xxx_messageInfo_Frame.Size(m)
+}
+func (m *Frame) XXX_DiscardUnknown() {
+	xxx_messageInfo_Frame.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Frame proto.InternalMessageInfo
+
+func (m *Frame) GetData() []byte {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+func (m *Frame) GetSize() int32 {
+	if m != nil {
+		return m.Size
+	}
+	return 0
+}
+
 func init() {
 	proto.RegisterType((*Req)(nil), "kstinter.req")
 	proto.RegisterType((*Rsp)(nil), "kstinter.rsp")
 	proto.RegisterMapType((map[string]string)(nil), "kstinter.rsp.KVsEntry")
+	proto.RegisterType((*Frame)(nil), "kstinter.frame")
 }
 
 func init() { proto.RegisterFile("kstinter.proto", fileDescriptor_3d0d0bb72c989a12) }
 
 var fileDescriptor_3d0d0bb72c989a12 = []byte{
-	// 290 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xc1, 0x4b, 0xc3, 0x30,
-	0x18, 0xc5, 0x6d, 0xb3, 0x95, 0xed, 0xd3, 0xc9, 0x08, 0x32, 0xca, 0x0e, 0x32, 0x7a, 0xaa, 0x08,
-	0x3d, 0x54, 0x10, 0xf1, 0x38, 0x2b, 0x22, 0x05, 0x95, 0x1d, 0xe6, 0x51, 0x5a, 0xfd, 0xc4, 0xd2,
-	0x9a, 0x65, 0x49, 0x36, 0xec, 0x41, 0xff, 0x3f, 0xff, 0x2b, 0x69, 0x62, 0x67, 0x85, 0xc1, 0x7a,
-	0xcb, 0xfb, 0xe5, 0xf1, 0xf2, 0xbe, 0x24, 0x70, 0x98, 0x4b, 0x95, 0x31, 0x85, 0x22, 0xe0, 0x62,
-	0xa1, 0x16, 0xb4, 0x57, 0x6b, 0xef, 0x13, 0x88, 0xc0, 0x25, 0x3d, 0x06, 0x48, 0x57, 0xcf, 0x39,
-	0xaa, 0xbb, 0xe4, 0x1d, 0x5d, 0x6b, 0x62, 0xf9, 0xfd, 0x59, 0x83, 0xd0, 0x21, 0x90, 0x1c, 0x4b,
-	0xd7, 0xd6, 0x1b, 0xd5, 0x92, 0x1e, 0x41, 0x77, 0x9d, 0x14, 0x2b, 0x74, 0x89, 0x66, 0x46, 0xd0,
-	0x11, 0x38, 0x5c, 0xe0, 0x6b, 0xf6, 0xe1, 0x76, 0x34, 0xfe, 0x55, 0x15, 0x7f, 0x49, 0x59, 0x95,
-	0xdd, 0x35, 0xdc, 0x28, 0xef, 0x0b, 0x88, 0x90, 0xfc, 0x2f, 0xcc, 0x6a, 0x86, 0x9d, 0x40, 0x27,
-	0x7f, 0x5a, 0x4b, 0xd7, 0x9e, 0x10, 0x7f, 0x3f, 0x1c, 0x05, 0x9b, 0x21, 0x84, 0xe4, 0x41, 0x3c,
-	0x97, 0xd7, 0x4c, 0x89, 0x72, 0x46, 0xf2, 0xb9, 0x1c, 0x9f, 0x43, 0xaf, 0x06, 0x75, 0x57, 0x6b,
-	0x4b, 0x57, 0xbb, 0x11, 0x7f, 0x69, 0x5f, 0x58, 0xe1, 0xb7, 0x0d, 0x9b, 0xbb, 0xa0, 0x01, 0x1c,
-	0x5c, 0x09, 0x4c, 0x14, 0x4e, 0xf5, 0xe0, 0x74, 0xd0, 0x38, 0x11, 0x97, 0xe3, 0xc1, 0xbf, 0x02,
-	0xde, 0x1e, 0x3d, 0x85, 0x7e, 0x84, 0x45, 0x7b, 0xf3, 0x2d, 0x93, 0x28, 0x54, 0x8c, 0xe5, 0x4e,
-	0xb3, 0x0f, 0x4e, 0x84, 0x45, 0x4b, 0xe7, 0x0d, 0xb6, 0xca, 0x0c, 0x61, 0x68, 0x9c, 0x8f, 0x99,
-	0x7a, 0x7b, 0x30, 0xcf, 0xd2, 0xa2, 0xf4, 0x3d, 0x47, 0x16, 0x4b, 0x15, 0x4d, 0x77, 0x99, 0x53,
-	0x47, 0xff, 0xad, 0xb3, 0x9f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xb6, 0x1e, 0xd0, 0x46, 0x6d, 0x02,
-	0x00, 0x00,
+	// 339 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0x51, 0x4b, 0x32, 0x41,
+	0x14, 0x75, 0x76, 0xdd, 0xfd, 0xf4, 0x7e, 0x5a, 0x32, 0x84, 0x2c, 0x3e, 0x84, 0xec, 0xd3, 0x46,
+	0xb5, 0x85, 0x41, 0x44, 0x8f, 0x66, 0x44, 0x08, 0x11, 0x0b, 0xd9, 0x63, 0xac, 0x7a, 0xa5, 0x65,
+	0x6c, 0x5d, 0x67, 0x46, 0xc9, 0xa0, 0xfe, 0x77, 0x6f, 0xb1, 0x33, 0xa9, 0x9b, 0x05, 0xee, 0xdb,
+	0x3d, 0xe7, 0x9e, 0x7b, 0x38, 0xf7, 0xce, 0xc0, 0x0e, 0x13, 0x32, 0x8a, 0x25, 0x72, 0x3f, 0xe1,
+	0x13, 0x39, 0xa1, 0xa5, 0x25, 0x76, 0xdf, 0xc1, 0xe4, 0x38, 0xa5, 0xfb, 0x00, 0xfd, 0xd9, 0x80,
+	0xa1, 0xbc, 0x0b, 0x5f, 0xd0, 0x21, 0x4d, 0xe2, 0x95, 0x83, 0x0c, 0x43, 0x6b, 0x60, 0x32, 0x5c,
+	0x38, 0x86, 0x6a, 0xa4, 0x25, 0xdd, 0x03, 0x6b, 0x1e, 0x8e, 0x67, 0xe8, 0x98, 0x8a, 0xd3, 0x80,
+	0xd6, 0xc1, 0x4e, 0x38, 0x8e, 0xa2, 0x57, 0xa7, 0xa8, 0xe8, 0x6f, 0x94, 0xf2, 0xc3, 0x7e, 0x9c,
+	0x7a, 0x5b, 0x9a, 0xd7, 0xc8, 0xfd, 0x00, 0x93, 0x8b, 0x64, 0x6d, 0x46, 0xb2, 0x66, 0x07, 0x50,
+	0x64, 0x4f, 0x73, 0xe1, 0x18, 0x4d, 0xd3, 0xfb, 0xdf, 0xaa, 0xfb, 0xab, 0x25, 0xb8, 0x48, 0xfc,
+	0x6e, 0x4f, 0x5c, 0xc7, 0x92, 0x2f, 0x02, 0x93, 0xf5, 0x44, 0xe3, 0x1c, 0x4a, 0x4b, 0x62, 0x99,
+	0x95, 0xfc, 0x91, 0xd5, 0xc8, 0xd8, 0x5f, 0x1a, 0x17, 0xc4, 0x3d, 0x01, 0x6b, 0xc4, 0xd3, 0x05,
+	0x29, 0x14, 0x87, 0xa1, 0x0c, 0xd5, 0x54, 0x25, 0x50, 0x75, 0xca, 0x89, 0xe8, 0x4d, 0x4f, 0x59,
+	0x81, 0xaa, 0x5b, 0x9f, 0x06, 0xac, 0x8e, 0x47, 0x7d, 0xa8, 0x5c, 0x71, 0x0c, 0x25, 0xb6, 0xd5,
+	0xa5, 0x68, 0x35, 0x13, 0x11, 0xa7, 0x8d, 0xea, 0x8f, 0xc4, 0x6e, 0x81, 0x1e, 0x42, 0xb9, 0x83,
+	0xe3, 0xfc, 0xe2, 0xdb, 0x58, 0x20, 0x97, 0x5d, 0x5c, 0x6c, 0x15, 0x7b, 0x60, 0x77, 0x70, 0x9c,
+	0x53, 0x79, 0x83, 0xb9, 0x3c, 0x5b, 0x50, 0xd3, 0xca, 0xc7, 0x48, 0x3e, 0xdf, 0xeb, 0x77, 0xdc,
+	0x36, 0x73, 0x04, 0x76, 0x3b, 0x1c, 0xb0, 0x87, 0x64, 0x53, 0xb9, 0xbb, 0x86, 0xea, 0xe0, 0x6e,
+	0xe1, 0x94, 0xd0, 0x63, 0xf8, 0x17, 0xa0, 0x90, 0x13, 0x8e, 0x74, 0xb3, 0xff, 0xcb, 0xda, 0x23,
+	0x7d, 0x5b, 0x7d, 0xde, 0xb3, 0xaf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xa6, 0x6e, 0x39, 0xe9, 0xce,
+	0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -185,13 +236,22 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type KstinterClient interface {
+	//创建bucket
 	CreateBucket(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Rsp, error)
+	//删除bucket
 	DelBucket(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Rsp, error)
+	//插入键值对
 	InsertKey(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Rsp, error)
+	//删除键
 	DelKey(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Rsp, error)
+	//获取键
 	GetKey(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Rsp, error)
+	//按前缀获取键值
 	GetKeyWithPrefix(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Rsp, error)
-	OpenKstDB(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Rsp, error)
+	//数据备份
+	BackUp(ctx context.Context, in *Req, opts ...grpc.CallOption) (Kstinter_BackUpClient, error)
+	//数据恢复
+	Restore(ctx context.Context, opts ...grpc.CallOption) (Kstinter_RestoreClient, error)
 }
 
 type kstinterClient struct {
@@ -256,24 +316,90 @@ func (c *kstinterClient) GetKeyWithPrefix(ctx context.Context, in *Req, opts ...
 	return out, nil
 }
 
-func (c *kstinterClient) OpenKstDB(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Rsp, error) {
-	out := new(Rsp)
-	err := c.cc.Invoke(ctx, "/kstinter.kstinter/OpenKstDB", in, out, opts...)
+func (c *kstinterClient) BackUp(ctx context.Context, in *Req, opts ...grpc.CallOption) (Kstinter_BackUpClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Kstinter_serviceDesc.Streams[0], "/kstinter.kstinter/BackUp", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &kstinterBackUpClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Kstinter_BackUpClient interface {
+	Recv() (*Frame, error)
+	grpc.ClientStream
+}
+
+type kstinterBackUpClient struct {
+	grpc.ClientStream
+}
+
+func (x *kstinterBackUpClient) Recv() (*Frame, error) {
+	m := new(Frame)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *kstinterClient) Restore(ctx context.Context, opts ...grpc.CallOption) (Kstinter_RestoreClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Kstinter_serviceDesc.Streams[1], "/kstinter.kstinter/Restore", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &kstinterRestoreClient{stream}
+	return x, nil
+}
+
+type Kstinter_RestoreClient interface {
+	Send(*Frame) error
+	CloseAndRecv() (*Rsp, error)
+	grpc.ClientStream
+}
+
+type kstinterRestoreClient struct {
+	grpc.ClientStream
+}
+
+func (x *kstinterRestoreClient) Send(m *Frame) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *kstinterRestoreClient) CloseAndRecv() (*Rsp, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(Rsp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // KstinterServer is the server API for Kstinter service.
 type KstinterServer interface {
+	//创建bucket
 	CreateBucket(context.Context, *Req) (*Rsp, error)
+	//删除bucket
 	DelBucket(context.Context, *Req) (*Rsp, error)
+	//插入键值对
 	InsertKey(context.Context, *Req) (*Rsp, error)
+	//删除键
 	DelKey(context.Context, *Req) (*Rsp, error)
+	//获取键
 	GetKey(context.Context, *Req) (*Rsp, error)
+	//按前缀获取键值
 	GetKeyWithPrefix(context.Context, *Req) (*Rsp, error)
-	OpenKstDB(context.Context, *Req) (*Rsp, error)
+	//数据备份
+	BackUp(*Req, Kstinter_BackUpServer) error
+	//数据恢复
+	Restore(Kstinter_RestoreServer) error
 }
 
 // UnimplementedKstinterServer can be embedded to have forward compatible implementations.
@@ -298,8 +424,11 @@ func (*UnimplementedKstinterServer) GetKey(ctx context.Context, req *Req) (*Rsp,
 func (*UnimplementedKstinterServer) GetKeyWithPrefix(ctx context.Context, req *Req) (*Rsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetKeyWithPrefix not implemented")
 }
-func (*UnimplementedKstinterServer) OpenKstDB(ctx context.Context, req *Req) (*Rsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method OpenKstDB not implemented")
+func (*UnimplementedKstinterServer) BackUp(req *Req, srv Kstinter_BackUpServer) error {
+	return status.Errorf(codes.Unimplemented, "method BackUp not implemented")
+}
+func (*UnimplementedKstinterServer) Restore(srv Kstinter_RestoreServer) error {
+	return status.Errorf(codes.Unimplemented, "method Restore not implemented")
 }
 
 func RegisterKstinterServer(s *grpc.Server, srv KstinterServer) {
@@ -414,22 +543,51 @@ func _Kstinter_GetKeyWithPrefix_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Kstinter_OpenKstDB_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Req)
-	if err := dec(in); err != nil {
+func _Kstinter_BackUp_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Req)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(KstinterServer).BackUp(m, &kstinterBackUpServer{stream})
+}
+
+type Kstinter_BackUpServer interface {
+	Send(*Frame) error
+	grpc.ServerStream
+}
+
+type kstinterBackUpServer struct {
+	grpc.ServerStream
+}
+
+func (x *kstinterBackUpServer) Send(m *Frame) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Kstinter_Restore_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(KstinterServer).Restore(&kstinterRestoreServer{stream})
+}
+
+type Kstinter_RestoreServer interface {
+	SendAndClose(*Rsp) error
+	Recv() (*Frame, error)
+	grpc.ServerStream
+}
+
+type kstinterRestoreServer struct {
+	grpc.ServerStream
+}
+
+func (x *kstinterRestoreServer) SendAndClose(m *Rsp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *kstinterRestoreServer) Recv() (*Frame, error) {
+	m := new(Frame)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
-	if interceptor == nil {
-		return srv.(KstinterServer).OpenKstDB(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/kstinter.kstinter/OpenKstDB",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KstinterServer).OpenKstDB(ctx, req.(*Req))
-	}
-	return interceptor(ctx, in, info, handler)
+	return m, nil
 }
 
 var _Kstinter_serviceDesc = grpc.ServiceDesc{
@@ -460,11 +618,18 @@ var _Kstinter_serviceDesc = grpc.ServiceDesc{
 			MethodName: "GetKeyWithPrefix",
 			Handler:    _Kstinter_GetKeyWithPrefix_Handler,
 		},
+	},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "OpenKstDB",
-			Handler:    _Kstinter_OpenKstDB_Handler,
+			StreamName:    "BackUp",
+			Handler:       _Kstinter_BackUp_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "Restore",
+			Handler:       _Kstinter_Restore_Handler,
+			ClientStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "kstinter.proto",
 }

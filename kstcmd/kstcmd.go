@@ -40,25 +40,37 @@ type keycontext struct{
 	set *cobra.Command
 	delete *cobra.Command
 	get *cobra.Command
+	test_set *cobra.Command
+	test_get *cobra.Command
 
 	flag_key string
 	flag_value string
 	flag_bucket string
 	flag_addr string
 	flag_prefix bool
+	flag_threads int
+	flag_count int
 }
 
 type restorecontext struct{
 	restore *cobra.Command
-
+	flag_addr string
 	flag_file_name string
 }
+
+type backupcontext struct{
+	backup *cobra.Command
+	flag_addr string
+	flag_file_name string
+}
+
+
 //命令上下文全局变量定义
 var serverctx = servercontext{}
 var buckctx = bucketcontext{}
 var keyctx = keycontext{}
 var restorectx = restorecontext{}
-
+var backupctx = backupcontext{}
 const(
 	FLAG_ADDR = "addr"
 	FLAG_ADDR_DEFAULT = "localhost:12345"
@@ -90,8 +102,7 @@ const(
 
 	FLAG_FILE_NAME = "filename"
 	FLAG_FILE_NAME_DEFAULT =""
-	FLAG_FILE_NAME_DETAIL = "restore file name"
-
+	FLAG_FILE_NAME_DETAIL = "restore/backup file name"
 )
 
 func init(){
@@ -156,6 +167,26 @@ func init(){
 			kstclient.InsertKey(keyctx.flag_bucket, keyctx.flag_key, keyctx.flag_value)
 		},
 	}
+	keyctx.test_set = &cobra.Command{
+		Use:   "test",
+		Short: "test set",
+		Long:  "test set",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("set test")
+			kstclient.InitClient(keyctx.flag_addr)
+			kstclient.TestSet(keyctx.flag_threads, keyctx.flag_count)
+		},
+	}
+	keyctx.test_get = &cobra.Command{
+		Use:   "test",
+		Short: "test get",
+		Long:  "test get",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("get test")
+			kstclient.InitClient(keyctx.flag_addr)
+			kstclient.TestGet(keyctx.flag_threads, keyctx.flag_count)
+		},
+	}
 	keyctx.delete = &cobra.Command{
 		Use:   "delete",
 		Short: "delete a key",
@@ -181,7 +212,6 @@ func init(){
 
 		},
 	}
-
 	//restorectx初始化
 	restorectx.restore = &cobra.Command{
 		Use:   "restore",
@@ -189,10 +219,21 @@ func init(){
 		Long:  "restore a specific boltdb",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("restore exec")
+			kstclient.InitClient(restorectx.flag_addr)
 			kstclient.UploadFile(restorectx.flag_file_name)
 		},
 	}
-
+	//restorectx初始化
+	backupctx.backup = &cobra.Command{
+		Use:   "backup",
+		Short: "backup boltdb to a specific file",
+		Long:  "backup boltdb to a specific file",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("backup exec")
+			kstclient.InitClient(backupctx.flag_addr)
+			kstclient.Backup(backupctx.flag_file_name)
+		},
+	}
 	serverctx.server.Flags().StringVar(&serverctx.flag_port, FLAG_PORT, FLAG_PORT_DEFAULT, FLAG_PORT_DETAIL)
 	RootCmd.AddCommand(serverctx.server)
 
@@ -222,6 +263,13 @@ func init(){
 	keyctx.set.MarkFlagRequired(FLAG_KEY)
 	keyctx.key.AddCommand(keyctx.set)
 
+	keyctx.test_set.Flags().StringVar(&keyctx.flag_addr, FLAG_ADDR, FLAG_ADDR_DEFAULT, FLAG_ADDR_DETAIL)
+	keyctx.test_set.Flags().IntVar(&keyctx.flag_threads, "threads", 0, "")
+	keyctx.test_set.Flags().IntVar(&keyctx.flag_count, "count", 0, "")
+	keyctx.test_set.MarkFlagRequired("threads")
+	keyctx.test_set.MarkFlagRequired("count")
+	keyctx.set.AddCommand(keyctx.test_set)
+
 	//添加get
 	keyctx.get.Flags().StringVar(&keyctx.flag_key, FLAG_KEY, FLAG_KEY_DEFAULT, FLAG_KEY_DETAIL)
 	keyctx.get.Flags().StringVar(&keyctx.flag_bucket, FLAG_BUCKET, FLAG_BUCKET_DEFALUT, FLAG_BUCKET_DETAIL)
@@ -230,6 +278,13 @@ func init(){
 	keyctx.get.MarkFlagRequired(FLAG_BUCKET)
 	keyctx.get.MarkFlagRequired(FLAG_KEY)
 	keyctx.key.AddCommand(keyctx.get)
+
+	keyctx.test_get.Flags().StringVar(&keyctx.flag_addr, FLAG_ADDR, FLAG_ADDR_DEFAULT, FLAG_ADDR_DETAIL)
+	keyctx.test_get.Flags().IntVar(&keyctx.flag_threads, "threads", 0, "")
+	keyctx.test_get.Flags().IntVar(&keyctx.flag_count, "count", 0, "")
+	keyctx.test_get.MarkFlagRequired("threads")
+	keyctx.test_get.MarkFlagRequired("count")
+	keyctx.get.AddCommand(keyctx.test_get)
 
 	//添加delete
 	keyctx.delete.Flags().StringVar(&keyctx.flag_key, FLAG_KEY, FLAG_KEY_DEFAULT, FLAG_KEY_DETAIL)
@@ -240,6 +295,13 @@ func init(){
 	keyctx.key.AddCommand(keyctx.delete)
 
 	//添加restore
+	restorectx.restore.Flags().StringVar(&restorectx.flag_addr, FLAG_ADDR, FLAG_ADDR_DEFAULT, FLAG_ADDR_DETAIL)
 	restorectx.restore.Flags().StringVar(&restorectx.flag_file_name, FLAG_FILE_NAME, FLAG_FILE_NAME_DEFAULT, FLAG_FILE_NAME_DETAIL)
+	restorectx.restore.MarkFlagRequired(FLAG_FILE_NAME)
 	RootCmd.AddCommand(restorectx.restore)
+
+	backupctx.backup.Flags().StringVar(&backupctx.flag_addr, FLAG_ADDR, FLAG_ADDR_DEFAULT, FLAG_ADDR_DETAIL)
+	backupctx.backup.Flags().StringVar(&backupctx.flag_file_name, FLAG_FILE_NAME, FLAG_FILE_NAME_DEFAULT, FLAG_FILE_NAME_DETAIL)
+	backupctx.backup.MarkFlagRequired(FLAG_FILE_NAME)
+	RootCmd.AddCommand(backupctx.backup)
 }
